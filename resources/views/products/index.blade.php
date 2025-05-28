@@ -96,31 +96,31 @@
   <div class="grid">
     @foreach($products as $product)
       <article>
-        <hgroup>
-          <h3>{{ $product->name }}</h3>
-          <p>¥{{ number_format($product->price) }}</p>
-        </hgroup>
-        <figure>
+        <a href="{{ route('products.show', $product->id) }}">
           <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-          <figcaption>{{ $product->name }}</figcaption>
-        </figure>
+          <h3>{{ $product->name }}</h3>
+        </a>
+        <p>¥{{ number_format($product->price) }}</p>
         <p>{{ $product->description }}</p>
-        @if($product->seasons->isNotEmpty())
-          <p>季節:
-            @foreach($product->seasons->unique('id') as $season)
-              <span style="background:#eee;padding:2px 6px;margin:2px;border-radius:4px;">{{ $season->name }}</span>
-            @endforeach
-          </p>
-          <a href="{{ route('products.edit', $product->id) }}" role="button">編集</a>
-          <form method="POST" action="{{ route('products.destroy', $product->id) }}" style="display:inline;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" title="削除" style="color: red; font-size: 1.5rem; background: none; border: none;">"削除"</button>
-          </form>
-        @endif
+        <p>
+          @foreach($product->seasons->unique('id') as $season)
+            <span style="background:#eee;padding:2px 6px;margin:2px;border-radius:4px;">{{ $season->name }}</span>
+          @endforeach
+        </p>
+        <a href="{{ route('products.edit', $product->id) }}" role="button">編集</a>
+        <form method="POST" action="{{ route('products.destroy', $product->id) }}" style="display:inline;">
+          @csrf
+          @method('DELETE')
+          <button type="submit" title="削除" style="color: red; background: none; border: none;">削除</button>
+        </form>
       </article>
     @endforeach
   </div>
+
+  <div>
+    {{ $products->links() }}
+  </div>
+</main>
 
   <div>
     {{ $products->links() }}

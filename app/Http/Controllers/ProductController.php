@@ -24,15 +24,8 @@ class ProductController extends Controller
 
         $validated = $request->validated();
 
-        $product = Product::create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'description' => $request->description,
-            'image' => $path ?? null,         
-        ]);
-
         $imagePath = $request->file('image')->store('images', 'public');
-
+        
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
@@ -45,28 +38,26 @@ class ProductController extends Controller
         return redirect()->route('products.index');
     }
 
-    public function index(ProductRequest $request)
+    public function index(Request $request)
     {
-        $query = Product::query()->with('seasons');
-
-        // 検索処理
+        $query = Product::with('seasons');
+        
         if ($request->filled('keyword')) {
             $query->where('name', 'like', '%' . $request->keyword . '%');
         }
 
-        // 並び替え処理
         if ($request->sort === 'high') {
             $query->orderBy('price', 'desc');
         } elseif ($request->sort === 'low') {
             $query->orderBy('price', 'asc');
-        }
+        }   
 
         $products = $query->paginate(6);
 
         return view('products.index', compact('products'));
     }
 
-    public function edit(ProductRequest $product)
+    public function edit(Product $product)
     {
         $seasons = Season::all();
         $selectedSeasons = $product->seasons->pluck('id')->toArray();
@@ -74,7 +65,7 @@ class ProductController extends Controller
         return view('products.edit', compact('product', 'seasons', 'selectedSeasons'));
     }
 
-    public function update(Product $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
         // 新しい画像があれば保存
         if ($request->hasFile('image')) {
@@ -102,7 +93,6 @@ class ProductController extends Controller
 
         return redirect()->route('products.index');
     }
-    use App\Models\Product;
 
     public function show($id)
     {
