@@ -67,20 +67,17 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, Product $product)
     {
-        // 新しい画像があれば保存
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('images/fruits-img', 'public');
             $product->image = $path;
         }
 
-        // 更新
         $product->update([
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
         ]);
 
-        // 中間テーブル更新
         $product->seasons()->sync($request->seasons);
 
         return redirect()->route('products.index');
@@ -88,7 +85,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {   
-        $product->seasons()->detach(); // 中間テーブルも忘れず
+        $product->seasons()->detach(); 
         $product->delete();
 
         return redirect()->route('products.index');
